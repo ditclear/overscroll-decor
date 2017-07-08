@@ -41,6 +41,11 @@
             android:title="Misc-Views Demo"
             />
 
+        <item
+                android:id="@+id/drawer_item_coor_demo"
+                android:icon="@drawable/ic_misc"
+                android:title="Coordi Demo"
+                />
     </group>
 
 </menu>

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import me.everything.overscrolldemo.view.DemoFragment;
 import me.everything.overscrolldemo.view.GridViewDemoFragment;
 import me.everything.overscrolldemo.view.ListViewDemoFragment;
 import me.everything.overscrolldemo.view.MiscViewsDemoFragment;
@@ -33,7 +34,8 @@ public class OverScrollDemoActivity extends AppCompatActivity
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -65,7 +67,8 @@ public class OverScrollDemoActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.drawer_item_recyclerview_demo:
-                replaceMainFragment(new RecyclerViewDemoFragment(), R.string.recycler_view_demo_title);
+                replaceMainFragment(new RecyclerViewDemoFragment(),
+                        R.string.recycler_view_demo_title);
                 break;
             case R.id.drawer_item_gridview_demo:
                 replaceMainFragment(new GridViewDemoFragment(), R.string.grid_view_demo_title);
@@ -74,7 +77,8 @@ public class OverScrollDemoActivity extends AppCompatActivity
                 replaceMainFragment(new ListViewDemoFragment(), R.string.list_view_demo_title);
                 break;
             case R.id.drawer_item_recyclerview_staggered_grid_demo:
-                replaceMainFragment(new RecyclerViewStaggeredGridDemoFragment(), R.string.recycler_view_staggered_grid_demo_title);
+                replaceMainFragment(new RecyclerViewStaggeredGridDemoFragment(),
+                        R.string.recycler_view_staggered_grid_demo_title);
                 break;
             case R.id.drawer_item_scrollview_demo:
                 replaceMainFragment(new ScrollViewDemoFragment(), R.string.scroll_view_demo_title);
@@ -83,7 +87,10 @@ public class OverScrollDemoActivity extends AppCompatActivity
                 replaceMainFragment(new MiscViewsDemoFragment(), R.string.misc_views_demo_title);
                 break;
             case R.id.drawer_item_viewpager_demo:
-                replaceMainFragment(new ViewPagerDemoFragment(),R.string.viewpager_demo_title);
+                replaceMainFragment(new ViewPagerDemoFragment(), R.string.viewpager_demo_title);
+                break;
+            case R.id.drawer_item_coor_demo:
+                replaceMainFragment(new DemoFragment(), R.string.viewpager_demo_title);
                 break;
         }
 
