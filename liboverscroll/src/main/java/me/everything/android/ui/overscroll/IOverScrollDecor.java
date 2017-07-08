@@ -8,11 +8,16 @@ import android.view.View;
 public interface IOverScrollDecor {
     View getView();
 
+    void attach();
+
     void setOverScrollStateListener(IOverScrollStateListener listener);
+
     void setOverScrollUpdateListener(IOverScrollUpdateListener listener);
 
     /**
-     * Get the current decorator's runtime state, i.e. one of the values specified by {@link IOverScrollState}.
+     * Get the current decorator's runtime state, i.e. one of the values specified by {@link
+     * IOverScrollState}.
+     *
      * @return The state.
      */
     int getCurrentState();
@@ -30,4 +35,10 @@ public interface IOverScrollDecor {
      * overridden by calling <code>View.setOverScrollMode(mode)</code> immediately thereafter.</p>
      */
     void detach();
+
+    void setHeaderHeight(float height);
+
+    float getHeight();
+
+    void setCurrentState(@IOverScrollState int state);
 }

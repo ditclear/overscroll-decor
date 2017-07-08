@@ -14,25 +14,13 @@ import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorat
 
 /**
  * @author amitd
- *
  * @see HorizontalOverScrollBounceEffectDecorator
  * @see VerticalOverScrollBounceEffectDecorator
  */
 public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorAdapter {
 
-    /**
-     * A delegation of the adapter implementation of this view that should provide the processing
-     * of {@link #isInAbsoluteStart()} and {@link #isInAbsoluteEnd()}. Essentially needed simply
-     * because the implementation depends on the layout manager implementation being used.
-     */
-    protected interface Impl {
-        boolean isInAbsoluteStart();
-        boolean isInAbsoluteEnd();
-    }
-
     protected final RecyclerView mRecyclerView;
     protected final Impl mImpl;
-
     protected boolean mIsItemTouchInEffect = false;
 
     public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView) {
@@ -41,23 +29,55 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
 
         final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager instanceof LinearLayoutManager ||
-            layoutManager instanceof StaggeredGridLayoutManager)
-        {
+                layoutManager instanceof StaggeredGridLayoutManager) {
             final int orientation =
                     (layoutManager instanceof LinearLayoutManager
-                        ? ((LinearLayoutManager) layoutManager).getOrientation()
-                        : ((StaggeredGridLayoutManager) layoutManager).getOrientation());
+                            ? ((LinearLayoutManager) layoutManager).getOrientation()
+                            : ((StaggeredGridLayoutManager) layoutManager).getOrientation());
 
             if (orientation == LinearLayoutManager.HORIZONTAL) {
                 mImpl = new ImplHorizLayout();
             } else {
                 mImpl = new ImplVerticalLayout();
             }
+        } else {
+            throw new IllegalArgumentException(
+                    "Recycler views with custom layout managers are not supported by this adapter"
+                            + " out of the box."
+                            +
+                            "Try implementing and providing an explicit 'impl' parameter to the "
+                            + "other c'tors, or otherwise create a custom adapter subclass of "
+                            + "your own.");
         }
-        else
-        {
-            throw new IllegalArgumentException("Recycler views with custom layout managers are not supported by this adapter out of the box." +
-                    "Try implementing and providing an explicit 'impl' parameter to the other c'tors, or otherwise create a custom adapter subclass of your own.");
+    }
+
+    public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView, boolean isRefresh) {
+
+        mRecyclerView = recyclerView;
+
+        final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+        if (layoutManager instanceof LinearLayoutManager ||
+                layoutManager instanceof StaggeredGridLayoutManager) {
+            final int orientation =
+                    (layoutManager instanceof LinearLayoutManager
+                            ? ((LinearLayoutManager) layoutManager).getOrientation()
+                            : ((StaggeredGridLayoutManager) layoutManager).getOrientation());
+
+            if (orientation == LinearLayoutManager.HORIZONTAL) {
+                mImpl = new ImplHorizLayout();
+            } else {
+                mImpl = new ImplVerticalLayout();
+            }
+        } else if (isRefresh) {
+            mImpl = new ImplVerticalLayout();
+        } else {
+            throw new IllegalArgumentException(
+                    "Recycler views with custom layout managers are not supported by this adapter"
+                            + " out of the box."
+                            +
+                            "Try implementing and providing an explicit 'impl' parameter to the "
+                            + "other c'tors, or otherwise create a custom adapter subclass of "
+                            + "your own.");
         }
     }
 
@@ -66,17 +86,20 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         mImpl = impl;
     }
 
-    public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView, ItemTouchHelper.Callback itemTouchHelperCallback) {
+    public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView,
+            ItemTouchHelper.Callback itemTouchHelperCallback) {
         this(recyclerView);
         setUpTouchHelperCallback(itemTouchHelperCallback);
     }
 
-    public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView, Impl impl, ItemTouchHelper.Callback itemTouchHelperCallback) {
+    public RecyclerViewOverScrollDecorAdapter(RecyclerView recyclerView, Impl impl,
+            ItemTouchHelper.Callback itemTouchHelperCallback) {
         this(recyclerView, impl);
         setUpTouchHelperCallback(itemTouchHelperCallback);
     }
 
-    protected void setUpTouchHelperCallback(final ItemTouchHelper.Callback itemTouchHelperCallback) {
+    protected void setUpTouchHelperCallback(
+            final ItemTouchHelper.Callback itemTouchHelperCallback) {
         new ItemTouchHelper(new ItemTouchHelperCallbackWrapper(itemTouchHelperCallback) {
             @Override
             public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
@@ -101,30 +124,15 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         return !mIsItemTouchInEffect && mImpl.isInAbsoluteEnd();
     }
 
-    protected class ImplHorizLayout implements Impl {
+    /**
+     * A delegation of the adapter implementation of this view that should provide the processing
+     * of {@link #isInAbsoluteStart()} and {@link #isInAbsoluteEnd()}. Essentially needed simply
+     * because the implementation depends on the layout manager implementation being used.
+     */
+    protected interface Impl {
+        boolean isInAbsoluteStart();
 
-        @Override
-        public boolean isInAbsoluteStart() {
-            return !mRecyclerView.canScrollHorizontally(-1);
-        }
-
-        @Override
-        public boolean isInAbsoluteEnd() {
-            return !mRecyclerView.canScrollHorizontally(1);
-        }
-    }
-
-    protected class ImplVerticalLayout implements Impl {
-
-        @Override
-        public boolean isInAbsoluteStart() {
-            return !mRecyclerView.canScrollVertically(-1);
-        }
-
-        @Override
-        public boolean isInAbsoluteEnd() {
-            return !mRecyclerView.canScrollVertically(1);
-        }
+        boolean isInAbsoluteEnd();
     }
 
     private static class ItemTouchHelperCallbackWrapper extends ItemTouchHelper.Callback {
@@ -141,7 +149,8 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         }
 
         @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                RecyclerView.ViewHolder target) {
             return mCallback.onMove(recyclerView, viewHolder, target);
         }
 
@@ -156,7 +165,8 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         }
 
         @Override
-        public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current, RecyclerView.ViewHolder target) {
+        public boolean canDropOver(RecyclerView recyclerView, RecyclerView.ViewHolder current,
+                RecyclerView.ViewHolder target) {
             return mCallback.canDropOver(recyclerView, current, target);
         }
 
@@ -186,7 +196,8 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         }
 
         @Override
-        public RecyclerView.ViewHolder chooseDropTarget(RecyclerView.ViewHolder selected, List<RecyclerView.ViewHolder> dropTargets, int curX, int curY) {
+        public RecyclerView.ViewHolder chooseDropTarget(RecyclerView.ViewHolder selected,
+                List<RecyclerView.ViewHolder> dropTargets, int curX, int curY) {
             return mCallback.chooseDropTarget(selected, dropTargets, curX, curY);
         }
 
@@ -196,7 +207,8 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         }
 
         @Override
-        public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y) {
             mCallback.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
         }
 
@@ -206,23 +218,59 @@ public class RecyclerViewOverScrollDecorAdapter implements IOverScrollDecoratorA
         }
 
         @Override
-        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-            mCallback.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
+                boolean isCurrentlyActive) {
+            mCallback.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
+                    isCurrentlyActive);
         }
 
         @Override
-        public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-            mCallback.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        public void onChildDrawOver(Canvas c, RecyclerView recyclerView,
+                RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState,
+                boolean isCurrentlyActive) {
+            mCallback.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState,
+                    isCurrentlyActive);
         }
 
         @Override
-        public long getAnimationDuration(RecyclerView recyclerView, int animationType, float animateDx, float animateDy) {
-            return mCallback.getAnimationDuration(recyclerView, animationType, animateDx, animateDy);
+        public long getAnimationDuration(RecyclerView recyclerView, int animationType,
+                float animateDx, float animateDy) {
+            return mCallback.getAnimationDuration(recyclerView, animationType, animateDx,
+                    animateDy);
         }
 
         @Override
-        public int interpolateOutOfBoundsScroll(RecyclerView recyclerView, int viewSize, int viewSizeOutOfBounds, int totalSize, long msSinceStartScroll) {
-            return mCallback.interpolateOutOfBoundsScroll(recyclerView, viewSize, viewSizeOutOfBounds, totalSize, msSinceStartScroll);
+        public int interpolateOutOfBoundsScroll(RecyclerView recyclerView, int viewSize,
+                int viewSizeOutOfBounds, int totalSize, long msSinceStartScroll) {
+            return mCallback.interpolateOutOfBoundsScroll(recyclerView, viewSize,
+                    viewSizeOutOfBounds, totalSize, msSinceStartScroll);
+        }
+    }
+
+    protected class ImplHorizLayout implements Impl {
+
+        @Override
+        public boolean isInAbsoluteStart() {
+            return !mRecyclerView.canScrollHorizontally(-1);
+        }
+
+        @Override
+        public boolean isInAbsoluteEnd() {
+            return !mRecyclerView.canScrollHorizontally(1);
+        }
+    }
+
+    protected class ImplVerticalLayout implements Impl {
+
+        @Override
+        public boolean isInAbsoluteStart() {
+            return !mRecyclerView.canScrollVertically(-1);
+        }
+
+        @Override
+        public boolean isInAbsoluteEnd() {
+            return !mRecyclerView.canScrollVertically(1);
         }
     }
 }

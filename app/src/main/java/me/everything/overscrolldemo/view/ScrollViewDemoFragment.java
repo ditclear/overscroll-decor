@@ -19,10 +19,12 @@ public class ScrollViewDemoFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.scrollview_overscroll_demo, null, false);
-        initHorizontalScrollView((HorizontalScrollView) fragmentView.findViewById(R.id.horizontal_scroll_view));
-        initVerticalScrollView((ScrollView) fragmentView.findViewById(R.id.vertical_scroll_view));
+        initHorizontalScrollView(
+                (HorizontalScrollView) fragmentView.findViewById(R.id.horizontal_scroll_view));
+        initVerticalScrollView((ScrollView) fragmentView.findViewById(R.id.content_view));
         return fragmentView;
     }
 
@@ -31,7 +33,7 @@ public class ScrollViewDemoFragment extends Fragment {
     }
 
     private void initVerticalScrollView(ScrollView scrollView) {
-        OverScrollDecoratorHelper.setUpOverScroll(scrollView);
+//        OverScrollDecoratorHelper.setUpOverScroll(scrollView);
     }
 
 }

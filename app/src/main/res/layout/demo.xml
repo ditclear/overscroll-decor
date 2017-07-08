@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.everything.overscrolldemo.widget.RefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+    <android.support.design.widget.CoordinatorLayout
+            android:id="@id/content_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+        <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.design.widget.CollapsingToolbarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    app:contentScrim="@color/colorAccent"
+                    app:layout_scrollFlags="scroll">
+            </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                >
+
+        </android.support.v7.widget.RecyclerView>
+    </android.support.design.widget.CoordinatorLayout>
+
+    <me.everything.overscrolldemo.widget.ClassicRefreshView
+            android:id="@id/refresh_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    </me.everything.overscrolldemo.widget.ClassicRefreshView>
+
+    <me.everything.overscrolldemo.widget.ShapeLoadingRefreshView
+            android:id="@id/refresh_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+    </me.everything.overscrolldemo.widget.ShapeLoadingRefreshView>
+
+</me.everything.overscrolldemo.widget.RefreshLayout>

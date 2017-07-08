@@ -14,43 +14,10 @@ import me.everything.overscrolldemo.control.DemoItem;
 /**
  * @author amit
  */
-public abstract class DemoRecyclerAdapterBase extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class DemoRecyclerAdapterBase extends
+        RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int COLOR_VIEW_TYPE = 0;
-
-    public static class DemoViewHolder extends RecyclerView.ViewHolder {
-
-        public DemoViewHolder(int resId, ViewGroup parent, LayoutInflater inflater) {
-            super(inflater.inflate(resId, parent, false));
-
-            getTextView().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getTextView().getContext(), "Tapped on: "+getTextView().getText(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            getTextView().setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Toast.makeText(getTextView().getContext(), "Long-tapped on: "+getTextView().getText(), Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            });
-        }
-
-        public void init(DemoItem item) {
-            TextView textView = getTextView();
-            textView.setText(item.getColorName());
-
-            int color = item.getColor();
-            textView.setBackgroundColor(color);
-        }
-
-        private TextView getTextView() {
-            return (TextView) itemView;
-        }
-    }
-
     protected final LayoutInflater mInflater;
     protected List<DemoItem> mItems;
 
@@ -65,6 +32,16 @@ public abstract class DemoRecyclerAdapterBase extends RecyclerView.Adapter<Recyc
 
     public void setItems(List items) {
         mItems = items;
+    }
+
+    public void replace(List items) {
+        setItems(items);
+        notifyDataSetChanged();
+    }
+
+    public void addItems(List list) {
+        mItems.addAll(list);
+        notifyItemRangeInserted(mItems.size() - list.size(), list.size());
     }
 
     @Override
@@ -83,6 +60,42 @@ public abstract class DemoRecyclerAdapterBase extends RecyclerView.Adapter<Recyc
     @Override
     public int getItemCount() {
         return mItems.size();
+    }
+
+    public static class DemoViewHolder extends RecyclerView.ViewHolder {
+
+        public DemoViewHolder(int resId, ViewGroup parent, LayoutInflater inflater) {
+            super(inflater.inflate(resId, parent, false));
+
+            getTextView().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getTextView().getContext(),
+                            "Tapped on: " + getTextView().getText(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            getTextView().setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Toast.makeText(getTextView().getContext(),
+                            "Long-tapped on: " + getTextView().getText(),
+                            Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
+        public void init(DemoItem item) {
+            TextView textView = getTextView();
+            textView.setText(item.getColorName());
+
+            int color = item.getColor();
+            textView.setBackgroundColor(color);
+        }
+
+        private TextView getTextView() {
+            return (TextView) itemView;
+        }
     }
 
 }
