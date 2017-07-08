@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              xmlns:bind="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:paddingLeft="@dimen/activity_horizontal_margin"
               android:paddingRight="@dimen/activity_horizontal_margin"
@@ -30,7 +29,7 @@
       an artificial parent must be introduced so that bounds are clipped while over-scrolling is
       in effect.
       -->
-    <me.everything.overscrolldemo.widget.RefreshLayout
+    <me.everything.android.ui.overscroll.refreshlayout.RefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -38,9 +37,9 @@
             >
 
         <android.support.v7.widget.RecyclerView
-                android:id="@id/content_view"
+                android:id="@+id/content_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
-    </me.everything.overscrolldemo.widget.RefreshLayout>
+    </me.everything.android.ui.overscroll.refreshlayout.RefreshLayout>
 </LinearLayout>

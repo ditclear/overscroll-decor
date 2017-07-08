@@ -1,35 +1,24 @@
-package me.everything.overscrolldemo.widget;
+package me.everything.android.ui.overscroll.refreshlayout;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import me.everything.overscrolldemo.R;
+import com.wang.avi.AVLoadingIndicatorView;
+
+import me.everything.R;
 
 
 public class ClassicRefreshView extends FrameLayout implements Loadable {
 
-    private ImageView ivArrow;
-
 
     private TextView tvRefresh;
 
-    private ProgressBar progressBar;
+    private AVLoadingIndicatorView progressBar;
 
-
-    private Animation rotateUp;
-
-    private Animation rotateDown;
-    private Animation rotate;
-
-    private boolean rotated = false;
 
     private CharSequence completeStr = "COMPLETE";
     private CharSequence failureStr = "REFRESH FAILURE";
@@ -48,10 +37,6 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
     public ClassicRefreshView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        rotateUp = AnimationUtils.loadAnimation(context, R.anim.rotate_up);
-        rotateDown = AnimationUtils.loadAnimation(context, R.anim.rotate_down);
-        rotate = AnimationUtils.loadAnimation(context, R.anim.rotate);
-        rotate.setRepeatMode(Animation.INFINITE);
 
         View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_classic_refresh, null);
         addView(v);
@@ -95,9 +80,10 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
         super.onFinishInflate();
 
         tvRefresh = (TextView) findViewById(R.id.tvRefresh);
-        ivArrow = (ImageView) findViewById(R.id.ivArrow);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        progressBar = (AVLoadingIndicatorView) findViewById(R.id.progress_bar);
+
+        progressBar.smoothToShow();
     }
 
     @Override
@@ -123,10 +109,6 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
 
     @Override
     public void onReset() {
-        rotated = false;
-        ivArrow.clearAnimation();
-        ivArrow.setVisibility(VISIBLE);
-        progressBar.setVisibility(GONE);
         tvRefresh.setText(pullStr);
 
     }
@@ -134,42 +116,21 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
     @Override
     public void onPrepare() {
         tvRefresh.setText(releaseStr);
-        if (!rotated) {
-            ivArrow.clearAnimation();
-            ivArrow.startAnimation(rotateUp);
-            progressBar.setVisibility(GONE);
-            rotated = true;
-        }
     }
 
 
     @Override
     public void onComplete() {
-        rotated = false;
-
-        ivArrow.clearAnimation();
-        ivArrow.setVisibility(GONE);
-        progressBar.setVisibility(GONE);
         tvRefresh.setText(completeStr);
     }
 
     @Override
     public void onFailure() {
-        rotated = false;
-
-        ivArrow.clearAnimation();
-        ivArrow.setVisibility(GONE);
-        progressBar.setVisibility(GONE);
         tvRefresh.setText(failureStr);
     }
 
     @Override
     public void onLoad() {
-        rotated = false;
-        ivArrow.clearAnimation();
-        ivArrow.setVisibility(GONE);
-        progressBar.setVisibility(VISIBLE);
-//        progressBar.startAnimation(rotate);
         tvRefresh.setText(refreshingStr);
     }
 
@@ -177,26 +138,8 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
     public void onPositionChange(float currentPercent) {
 
 
-        ivArrow.setVisibility(VISIBLE);
-        progressBar.setVisibility(GONE);
+//        ViewCompat.animate(progressBar).rotation(Math.abs(currentPercent) * 360);
 
-        if (currentPercent < 1) {
-            if (rotated) {
-                ivArrow.clearAnimation();
-                ivArrow.startAnimation(rotateDown);
-                rotated = false;
-            }
-
-            tvRefresh.setText(pullStr);
-        } else {
-            tvRefresh.setText(releaseStr);
-            if (!rotated) {
-                ivArrow.clearAnimation();
-                ivArrow.startAnimation(rotateUp);
-                rotated = true;
-            }
-
-        }
     }
 
 }

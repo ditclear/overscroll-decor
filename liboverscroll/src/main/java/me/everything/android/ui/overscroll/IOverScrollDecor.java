@@ -14,6 +14,10 @@ public interface IOverScrollDecor {
 
     void setOverScrollUpdateListener(IOverScrollUpdateListener listener);
 
+    IOverScrollUpdateListener getUpdateListener();
+
+    IOverScrollStateListener getStateListener();
+
     /**
      * Get the current decorator's runtime state, i.e. one of the values specified by {@link
      * IOverScrollState}.
@@ -21,6 +25,8 @@ public interface IOverScrollDecor {
      * @return The state.
      */
     int getCurrentState();
+
+    void setCurrentState(@IOverScrollState int state);
 
     /**
      * Detach the decorator from its associated view, thus disabling it entirely.
@@ -39,6 +45,4 @@ public interface IOverScrollDecor {
     void setHeaderHeight(float height);
 
     float getHeight();
-
-    void setCurrentState(@IOverScrollState int state);
 }

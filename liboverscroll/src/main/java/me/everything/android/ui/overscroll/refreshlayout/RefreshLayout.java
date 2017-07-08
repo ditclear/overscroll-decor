@@ -1,11 +1,15 @@
-package me.everything.overscrolldemo.widget;
+package me.everything.android.ui.overscroll.refreshlayout;
 
 import static android.R.attr.orientation;
 
+import static me.everything.android.ui.overscroll.OverScrollDecoratorHelper.setUpStaticOverScroll;
+
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -18,6 +22,7 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import me.everything.R;
 import me.everything.android.ui.overscroll.IOverScrollDecor;
 import me.everything.android.ui.overscroll.IOverScrollState;
 import me.everything.android.ui.overscroll.IOverScrollStateListener;
@@ -25,10 +30,6 @@ import me.everything.android.ui.overscroll.IOverScrollUpdateListener;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorator;
 import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter;
-import me.everything.overscrolldemo.R;
-import me.everything.overscrolldemo.databinding.WidgetLayoutEmptyBinding;
-import me.everything.overscrolldemo.state.EmptyState;
-import me.everything.overscrolldemo.state.StateModel;
 
 /**
  * 页面描述：RefreshLayout
@@ -37,7 +38,7 @@ import me.everything.overscrolldemo.state.StateModel;
  */
 
 public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListener,
-        IOverScrollStateListener, StateModel.CallBack {
+        IOverScrollStateListener {
 
 
     //   下拉监听
@@ -53,8 +54,9 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
     private View mContentView;
     private View mFooterView;
     private int mHeaderHeight, mFooterHeight;
+    private AppBarLayout mAppBarLayout;
     private boolean isRefreshing;
-    private StateModel mStateModel = new StateModel();
+    private int offset = 0;
 
     public RefreshLayout(Context context) {
         super(context);
@@ -77,11 +79,19 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
     }
 
     @Override
-    public void onOverScrollUpdate(IOverScrollDecor decor, int state,
+    public void onOverScrollUpdate(IOverScrollDecor scrollDecor, int state,
             float offset) {
         ViewCompat.setTranslationY(mHeaderView, offset);
         ViewCompat.setTranslationY(mFooterView, offset);
+
         this.isRefreshing = offset >= 0;
+
+        if (scrollDecor.getView() instanceof AppBarLayout) {
+            //代表是AppBarLayout
+            ViewCompat.setTranslationY(decor.getView(), offset);
+        } else if (mAppBarLayout != null && isRefreshing) {
+            ViewCompat.setTranslationY(mAppBarLayout, offset);
+        }
         if (state != IOverScrollState.STATE_LOADING) {
             getIHeader().onPositionChange(offset / mHeaderHeight);
             getIFooter().onPositionChange(offset / mHeaderHeight);
@@ -106,23 +116,15 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
         if (mHeaderView == null) {
             mHeaderView = LayoutInflater.from(getContext()).inflate(R.layout.normal_header,
                     null);
-            addView(mHeaderView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+            addView(mHeaderView, new LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
         if (mFooterView == null) {
-            mFooterView = LayoutInflater.from(getContext()).inflate(R.layout.normal_footer,
+            mFooterView = LayoutInflater.from(getContext()).inflate(R.layout.normal_header,
                     null);
-            addView(mFooterView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+            addView(mFooterView, new LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
-
-        WidgetLayoutEmptyBinding layout = DataBindingUtil.inflate(LayoutInflater.from(getContext()),
-                R.layout.widget_layout_empty, null, false);
-        mStateModel.attach(this);
-        layout.setStateModel(mStateModel);
-        addView(layout.getRoot(),
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT));
 
         if (mHeaderView != null && !(mHeaderView instanceof Loadable)) {
 
@@ -138,41 +140,87 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
 
     }
 
-    public void showEmpty() {
-        mStateModel.setEmptyState(EmptyState.NET_ERROR);
-    }
-
     private void initContentView() {
 
         if (mContentView instanceof RecyclerView) {
             RecyclerView recyclerView = (RecyclerView) mContentView;
-            final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-
-            if (layoutManager == null) {
-                decor = new VerticalOverScrollBounceEffectDecorator(
-                        new RecyclerViewOverScrollDecorAdapter(
-                                recyclerView, true));
-            } else if (layoutManager instanceof LinearLayoutManager ||
-                    layoutManager instanceof StaggeredGridLayoutManager) {
-                if (orientation == LinearLayoutManager.HORIZONTAL) {
-                    throw new UnsupportedOperationException("unSupport orientation HORIZONTAL");
-                } else {
-                    decor = OverScrollDecoratorHelper.setUpOverScroll(recyclerView,
-                            OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
-                }
-            }
+            initRecyclerOverScroll(recyclerView);
         } else if (mContentView instanceof ListView) {
             decor = OverScrollDecoratorHelper.setUpOverScroll((ListView) mContentView);
         } else if (mContentView instanceof GridView) {
             decor = OverScrollDecoratorHelper.setUpOverScroll((GridView) mContentView);
         } else if (mContentView instanceof ScrollView) {
             decor = OverScrollDecoratorHelper.setUpOverScroll((ScrollView) mContentView);
+        } else if (mContentView instanceof CoordinatorLayout) {
+            if (((CoordinatorLayout) mContentView).getChildAt(0) instanceof AppBarLayout) {
+                mAppBarLayout = (AppBarLayout) ((CoordinatorLayout) mContentView).getChildAt(0);
+                IOverScrollDecor scrollDecor = OverScrollDecoratorHelper.setUpStaticOverScroll(
+                        mAppBarLayout,
+                        OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+                scrollDecor.setOverScrollUpdateListener(this);
+                scrollDecor.setOverScrollStateListener(this);
+
+                mAppBarLayout.addOnOffsetChangedListener(
+                        new AppBarLayout.OnOffsetChangedListener() {
+                            @Override
+                            public void onOffsetChanged(AppBarLayout appBarLayout,
+                                    int verticalOffset) {
+                                offset = verticalOffset;
+                                if (offset == 0) {
+                                    decor.attach();
+                                } else {
+                                    decor.detach();
+                                }
+                            }
+                        });
+            }
+            if (mContentView.findViewById(R.id.scroll_view) instanceof NestedScrollView) {
+                decor = OverScrollDecoratorHelper.setUpOverScroll(
+                        (NestedScrollView) mContentView.findViewById(R.id.scroll_view));
+            } else if (mContentView.findViewById(R.id.scroll_view) instanceof RecyclerView) {
+                initRecyclerOverScroll((RecyclerView) mContentView.findViewById(R.id.scroll_view));
+            } else {
+                decor = OverScrollDecoratorHelper.setUpOverScroll((CoordinatorLayout) mContentView,
+                        this, this);
+            }
+
         } else {
-            decor = OverScrollDecoratorHelper.setUpStaticOverScroll(mContentView,
+            decor = setUpStaticOverScroll(mContentView,
                     OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
         }
         decor.setOverScrollUpdateListener(this);
         decor.setOverScrollStateListener(this);
+    }
+
+    private IOverScrollDecor initRecyclerOverScroll(RecyclerView recyclerView) {
+        final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+
+        if (layoutManager == null) {
+            decor = new VerticalOverScrollBounceEffectDecorator(
+                    new RecyclerViewOverScrollDecorAdapter(
+                            recyclerView, true));
+        } else if (layoutManager instanceof LinearLayoutManager ||
+                layoutManager instanceof StaggeredGridLayoutManager) {
+            if (orientation == LinearLayoutManager.HORIZONTAL) {
+                throw new UnsupportedOperationException("unSupport orientation HORIZONTAL");
+            } else {
+                decor = OverScrollDecoratorHelper.setUpOverScroll(recyclerView,
+                        OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+            }
+        }
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (offset == 0 || !recyclerView.canScrollVertically(1)) {
+                    decor.attach();
+                } else {
+                    decor.detach();
+                }
+            }
+        });
+        return decor;
     }
 
     @Override
@@ -358,7 +406,6 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
     }
 
     public void loadSuccess() {
-        mStateModel.setEmptyState(EmptyState.NORMAL);
         if (isRefreshing) {
             getIHeader().onComplete();
             postDelayed(new Runnable() {
@@ -374,7 +421,6 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
     }
 
     public void loadFailure() {
-        mStateModel.setEmptyState(EmptyState.NORMAL);
         if (isRefreshing) {
             getIHeader().onFailure();
         }
@@ -386,6 +432,9 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
         }, 1000);
     }
 
+    public boolean isRefreshing() {
+        return this.decor.getCurrentState() == IOverScrollState.STATE_LOADING;
+    }
 
     public void setRefreshing(boolean refreshing) {
 
@@ -397,7 +446,7 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
             decor.setHeaderHeight(mHeaderHeight);
         }
         if (refreshing) {
-            if (mHeaderView != null) {
+            if (mHeaderView != null && !isRefreshing()) {
                 ViewCompat.setTranslationY(decor.getView(),
                         mHeaderHeight * 1.5f);
                 decor.setCurrentState(IOverScrollState.STATE_LOADING);
@@ -410,17 +459,6 @@ public class RefreshLayout extends FrameLayout implements IOverScrollUpdateListe
             decor.setCurrentState(IOverScrollState.STATE_BOUNCE_BACK);
 
         }
-    }
-
-    @Override
-    public void onFailure(Throwable e) {
-
-    }
-
-    @Override
-    public void onReload() {
-        mStateModel.setEmptyState(EmptyState.PROGRESS);
-        mOnRefreshListener.onRefresh();
     }
 
     /**

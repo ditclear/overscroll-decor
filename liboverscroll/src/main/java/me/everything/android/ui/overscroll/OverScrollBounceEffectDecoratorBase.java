@@ -12,6 +12,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
@@ -91,7 +92,6 @@ public abstract class OverScrollBounceEffectDecoratorBase implements IOverScroll
 
     protected IOverScrollStateListener mStateListener = new OverScrollStateListenerStub();
     protected IOverScrollUpdateListener mUpdateListener = new OverScrollUpdateListenerStub();
-
     /**
      * When in over-scroll mode, keep track of dragging velocity to provide a smooth slow-down
      * for the bounce-back effect.
@@ -111,6 +111,16 @@ public abstract class OverScrollBounceEffectDecoratorBase implements IOverScroll
         mCurrentState = mIdleState;
 
         attach();
+    }
+
+    @Override
+    public IOverScrollUpdateListener getUpdateListener() {
+        return mUpdateListener;
+    }
+
+    @Override
+    public IOverScrollStateListener getStateListener() {
+        return mStateListener;
     }
 
     @Override
@@ -201,7 +211,9 @@ public abstract class OverScrollBounceEffectDecoratorBase implements IOverScroll
                             + "precondition of that getCurrentState()==STATE_IDLE, first.");
         }
         getView().setOnTouchListener(null);
-        getView().setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+        if (!(getView().getParent() instanceof CoordinatorLayout)) {
+            getView().setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+        }
     }
 
     protected abstract MotionAttributes createMotionAttributes();

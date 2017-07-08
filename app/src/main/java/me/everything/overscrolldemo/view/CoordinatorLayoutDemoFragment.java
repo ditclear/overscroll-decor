@@ -4,8 +4,8 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,7 @@ import me.everything.overscrolldemo.widget.SlideInItemAnimator;
 /**
  * @author amitd
  */
-public class RecyclerViewStaggeredGridDemoFragment extends Fragment implements
+public class CoordinatorLayoutDemoFragment extends Fragment implements
         RefreshLayout.OnRefreshListener, RefreshLayout.OnLoadMoreListener {
 
     private static final int GRID_SPAN_COUNT = 2;
@@ -32,12 +32,12 @@ public class RecyclerViewStaggeredGridDemoFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.recyclerview_stgrid_overscroll_demo, null,
+        View fragmentView = inflater.inflate(R.layout.coordinator_demo, null,
                 false);
         refreshlayout = (RefreshLayout) fragmentView.findViewById(R.id.refresh_layout);
         refreshlayout.setOnLoadMoreListener(this);
         refreshlayout.setOnRefreshListener(this);
-        initVerticalRecyclerView((RecyclerView) fragmentView.findViewById(R.id.content_view));
+        initVerticalRecyclerView((RecyclerView) fragmentView.findViewById(R.id.scroll_view));
         return fragmentView;
     }
 
@@ -48,8 +48,9 @@ public class RecyclerViewStaggeredGridDemoFragment extends Fragment implements
                 appInflater);
         recyclerView.setAdapter(adapter);
 
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(GRID_SPAN_COUNT,
-                StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(
+                new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+
 
         recyclerView.setItemAnimator(new SlideInItemAnimator());
     }

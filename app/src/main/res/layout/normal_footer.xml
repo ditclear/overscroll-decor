@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<me.everything.overscrolldemo.widget.ShapeLoadingRefreshView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@id/refresh_footer"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-
-</me.everything.overscrolldemo.widget.ShapeLoadingRefreshView>
