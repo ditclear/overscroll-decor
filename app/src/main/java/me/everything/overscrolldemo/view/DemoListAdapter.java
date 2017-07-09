@@ -3,6 +3,7 @@ package me.everything.overscrolldemo.view;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.everything.overscrolldemo.R;
@@ -25,4 +26,6 @@ public class DemoListAdapter extends DemoListAdapterBase {
     protected DemoViewHolder createViewHolder(ViewGroup parent) {
         return new DemoViewHolder(R.layout.vertical_list_item, parent, mInflater);
     }
+
+
 }

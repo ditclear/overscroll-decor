@@ -1,10 +1,12 @@
 package me.everything.overscrolldemo.view;
 
+import android.animation.ObjectAnimator;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Chronometer;
 
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
@@ -20,21 +22,27 @@ public class MiscViewsDemoFragment extends Fragment {
     private Chronometer mChrono;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.misc_overscroll_demo, null, false);
 
         View textView = fragmentView.findViewById(R.id.demo_text);
-        OverScrollDecoratorHelper.setUpStaticOverScroll(textView, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
+        OverScrollDecoratorHelper.setUpStaticOverScroll(textView,
+                OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
 
         View imageView = fragmentView.findViewById(R.id.demo_image);
-        OverScrollDecoratorHelper.setUpStaticOverScroll(imageView, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+        OverScrollDecoratorHelper.setUpStaticOverScroll(imageView,
+                OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
+
 
         mChrono = (Chronometer) fragmentView.findViewById(R.id.demo_chronometer);
         if (savedInstanceState != null) {
             mChrono.setBase(savedInstanceState.getLong(CHRONO_TIME_SAVE_ID));
         }
-        OverScrollDecoratorHelper.setUpStaticOverScroll(mChrono, OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
+        OverScrollDecoratorHelper.setUpStaticOverScroll(mChrono,
+                OverScrollDecoratorHelper.ORIENTATION_HORIZONTAL);
         mChrono.start();
+
 
         return fragmentView;
     }

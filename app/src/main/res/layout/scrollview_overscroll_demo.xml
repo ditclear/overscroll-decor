@@ -67,7 +67,7 @@
      an artificial parent must be introduced so that bounds are clipped while over-scrolling is
      in effect.
      -->
-    <me.everything.overscrolldemo.widget.RefreshLayout
+    <me.everything.android.ui.overscroll.refreshlayout.RefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -75,19 +75,6 @@
             android:paddingTop="10dp"
             >
 
-        <me.everything.overscrolldemo.widget.ClassicRefreshView
-                android:id="@id/refresh_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-        </me.everything.overscrolldemo.widget.ClassicRefreshView>
-
-        <me.everything.overscrolldemo.widget.ShapeLoadingRefreshView
-                android:id="@id/refresh_footer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-        </me.everything.overscrolldemo.widget.ShapeLoadingRefreshView>
 
         <ScrollView
                 android:id="@id/content_view"
@@ -122,6 +109,6 @@
                 <include layout="@layout/scrollview_vertical_item"/>
             </LinearLayout>
         </ScrollView>
-    </me.everything.overscrolldemo.widget.RefreshLayout>
+    </me.everything.android.ui.overscroll.refreshlayout.RefreshLayout>
 
 </LinearLayout>

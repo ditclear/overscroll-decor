@@ -1,5 +1,6 @@
 package me.everything.android.ui.overscroll.adapters;
 
+import android.support.design.widget.CoordinatorLayout;
 import android.view.View;
 
 import me.everything.android.ui.overscroll.HorizontalOverScrollBounceEffectDecorator;
@@ -9,7 +10,6 @@ import me.everything.android.ui.overscroll.VerticalOverScrollBounceEffectDecorat
  * A static adapter for views that are ALWAYS over-scroll-able (e.g. image view).
  *
  * @author amit
- *
  * @see HorizontalOverScrollBounceEffectDecorator
  * @see VerticalOverScrollBounceEffectDecorator
  */
@@ -33,6 +33,9 @@ public class StaticOverScrollDecorAdapter implements IOverScrollDecoratorAdapter
 
     @Override
     public boolean isInAbsoluteEnd() {
+        if (mView.getParent() instanceof CoordinatorLayout) {
+            return false;
+        }
         return true;
     }
 }

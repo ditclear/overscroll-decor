@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.everything.overscrolldemo.control.DemoItem;
@@ -17,43 +18,8 @@ import me.everything.overscrolldemo.control.DemoItem;
 public abstract class DemoListAdapterBase extends BaseAdapter {
 
     private static final int COLOR_VIEW_TYPE = 0;
-
-    public static class DemoViewHolder {
-
-        TextView mTextView;
-
-        public DemoViewHolder(int resId, ViewGroup parent, LayoutInflater inflater) {
-            mTextView = (TextView) inflater.inflate(resId, parent, false);
-            mTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(mTextView.getContext(), "Tapped on: "+mTextView.getText(), Toast.LENGTH_SHORT).show();
-                }
-            });
-            mTextView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Toast.makeText(mTextView.getContext(), "Long-tapped on: "+mTextView.getText(), Toast.LENGTH_SHORT).show();
-                    return false;
-                }
-            });
-        }
-
-        public void init(DemoItem item) {
-            mTextView.setText(item.getColorName());
-
-            int color = item.getColor();
-            mTextView.setBackgroundColor(color);
-        }
-
-        public View getView() {
-            return mTextView;
-        }
-    }
-
     protected final LayoutInflater mInflater;
     protected List<DemoItem> mItems;
-
     protected DemoListAdapterBase(LayoutInflater inflater) {
         mInflater = inflater;
     }
@@ -61,6 +27,16 @@ public abstract class DemoListAdapterBase extends BaseAdapter {
     public DemoListAdapterBase(LayoutInflater inflater, List<DemoItem> items) {
         mInflater = inflater;
         mItems = items;
+    }
+
+    public void replace(ArrayList<DemoItem> demoItems) {
+        setItems(demoItems);
+        notifyDataSetChanged();
+    }
+
+    public void addItems(ArrayList<DemoItem> demoItems) {
+        mItems.addAll(demoItems);
+        notifyDataSetChanged();
     }
 
     public void setItems(List items) {
@@ -102,6 +78,41 @@ public abstract class DemoListAdapterBase extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         return COLOR_VIEW_TYPE;
+    }
+
+    public static class DemoViewHolder {
+
+        TextView mTextView;
+
+        public DemoViewHolder(int resId, ViewGroup parent, LayoutInflater inflater) {
+            mTextView = (TextView) inflater.inflate(resId, parent, false);
+            mTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(mTextView.getContext(), "Tapped on: " + mTextView.getText(),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            mTextView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Toast.makeText(mTextView.getContext(), "Long-tapped on: " + mTextView.getText(),
+                            Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        }
+
+        public void init(DemoItem item) {
+            mTextView.setText(item.getColorName());
+
+            int color = item.getColor();
+            mTextView.setBackgroundColor(color);
+        }
+
+        public View getView() {
+            return mTextView;
+        }
     }
 
 }

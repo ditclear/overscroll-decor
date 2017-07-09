@@ -1,13 +1,14 @@
 package me.everything.android.ui.overscroll.refreshlayout;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.wang.avi.AVLoadingIndicatorView;
 
 import me.everything.R;
 
@@ -17,7 +18,7 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
 
     private TextView tvRefresh;
 
-    private AVLoadingIndicatorView progressBar;
+    private ImageView progressBar;
 
 
     private CharSequence completeStr = "COMPLETE";
@@ -81,9 +82,15 @@ public class ClassicRefreshView extends FrameLayout implements Loadable {
 
         tvRefresh = (TextView) findViewById(R.id.tvRefresh);
 
-        progressBar = (AVLoadingIndicatorView) findViewById(R.id.progress_bar);
+        progressBar = (ImageView) findViewById(R.id.progress_bar);
 
-        progressBar.smoothToShow();
+
+        ObjectAnimator animator = ObjectAnimator.ofFloat(progressBar, "rotation",
+                0, 360);
+        animator.setRepeatCount(-1);
+        animator.setInterpolator(new LinearInterpolator());
+//        animator.setInterpolator(new OvershootInterpolator());
+        animator.setDuration(360 * 2).start();
     }
 
     @Override
